@@ -25,3 +25,12 @@ jobs:
       - name: Deploy App
         if: success()
         run: sudo npm run deploy -- -r "https://x-access-token:${{ secrets.github_token }}@github.com/${GITHUB_REPOSITORY}.git" -e builds/${{ github.event.number }}
+      - name: Comment link on PR
+        if: success()
+        run: |
+          curl \
+          -X POST \
+          "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${{ github.event.number }}/comments" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token ${{ secrets.github_token }}" \
+          --data '{ "body": "[Angular App](https://dwfsaints.github.io/workshop-actions/builds/${{ github.event.number }})" }' 
