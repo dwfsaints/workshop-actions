@@ -1,11 +1,9 @@
 name: pipeline-ci
-
 on:
   push:
     branches:
       - master
   pull_request:
-
 jobs:
   angular-project:
     runs-on: ubuntu-latest
@@ -17,4 +15,4 @@ jobs:
       - name: Deploy
       - run: npm install
       - run: npm run test
-      - run: npm run build 
+      - run: npm run build
