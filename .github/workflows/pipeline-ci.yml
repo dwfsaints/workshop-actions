@@ -1,0 +1,20 @@
+name: pipeline-ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  angular-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Deploy
+      - run: npm install
+      - run: npm run test
+      - run: npm run build 
