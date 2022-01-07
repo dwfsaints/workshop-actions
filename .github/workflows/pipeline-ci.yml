@@ -1,0 +1,36 @@
+name: pipeline-ci
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  angular-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: User Credentials
+        run: | 
+         git config user.name "GitHub Actions"
+         git config user.email "actions@users.noreply.github.com"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install Dependencies
+        run: npm install
+      - name: Testing
+        run: npm run test
+      - name: Build App
+        run: npm run build -- --base-href "https://dwfsaints.github.io/workshop-actions/builds/${{ github.event.number }}/app"
+      - name: Deploy App
+        if: success()
+        run: sudo npm run deploy -- -r "https://x-access-token:${{ secrets.github_token }}@github.com/${GITHUB_REPOSITORY}.git" -e builds/${{ github.event.number }}
+      - name: Comment link on PR
+        if: success()
+        run: |
+          curl \
+          -X POST \
+          "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/issues/${{ github.event.number }}/comments" \
+          -H "Content-Type: application/json" \
+          -H "Authorization: token ${{ secrets.github_token }}" \
+          --data '{ "body": "[Angular App](https://dwfsaints.github.io/workshop-actions/builds/${{ github.event.number }})" }' 

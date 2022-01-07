@@ -1,0 +1,54 @@
+name: pipeline-release
+on: 
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version'     
+        required: true
+jobs:
+  angular-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: User Credentials
+        run: | 
+         git config user.name "GitHub Actions"
+         git config user.email "actions@users.noreply.github.com"
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install Dependencies
+        run: npm install
+      - name: Testing
+        run: npm run test
+      - name: Build App
+        run: npm run build -- --base-href "https://dwfsaints.github.io/workshop-actions/releases/${{ github.event.inputs.releaseVersion }}/app"
+      - name: Deploy App
+        if: success()
+        run: sudo npm run deploy -- -r "https://x-access-token:${{ secrets.github_token }}@github.com/${GITHUB_REPOSITORY}.git" -e releases/${{  github.event.inputs.releaseVersion }}
+      - name: Create release
+        if: success()
+        run: |
+          curl \
+            -X POST \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/releases" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token ${{ secrets.github_token }}" \
+            --data '{ "tag_name": "${{ github.event.inputs.releaseVersion }}", "name": "${{ github.event.inputs.releaseVersion }}", "draft": true, "body": "[Angular App Release ${{ github.event.inputs.releaseVersion }}](https://dwfsaints.github.io/workshop-actions/releases/${{ github.event.inputs.releaseVersion }})" }'  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
