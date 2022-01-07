@@ -17,4 +17,7 @@ jobs:
       - name: Testing
         run: npm run test
       - name: Build App
-        run: npm run build 
+        run: npm run build -- --base-href "https://dwfsaints.github.io/workshop-actions/builds/${{ github.event.number }}/app"
+      - name: Deploy App
+        if: success()
+        run: sudo npm run deploy -- -r "https://x-access-token:${{ secrets.github_token }}@github.com/${GITHUB_REPOSITORY}.git" -e builds/${{ github.event.number }}
