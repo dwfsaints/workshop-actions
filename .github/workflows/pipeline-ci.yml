@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: User Credentials
+        run: | 
+         git config user.name "GitHub Actions"
+         git config user.email "actions@users.noreply.github.com"
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
